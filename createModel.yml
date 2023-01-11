@@ -1,0 +1,34 @@
+post:
+      operationId: models/createModel
+      tags:
+        - Models
+      summary: Create a new Content Fragment Model
+      description: This call allows defining a new Content Fragment Model.
+      requestBody:
+        $ref: '#/components/requestBodies/RequestContentFragmentModel'
+      responses:
+        '201':
+          description: The Content Fragment Model was successfully created.
+          headers:
+            Location:
+              schema:
+                type: string
+                format: uri
+              description: The URI at which the created model can be accessed.
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /cf/models/{id}:
+    parameters:
+      - $ref: '#/components/parameters/X-Adobe-Accept-Unsupported-API'
+      - in: path
+        name: id
+        required: true
+        description: The ID of the Content Fragment Model to retrieve.
+        schema:
+          $ref: '#/components/schemas/Base64URLId'
