@@ -45,7 +45,7 @@ export default function Home({ headlines, logo}) {
 }
 
 export async function getServerSideProps() {
-  const res = await aemHeadlessClient.getPresistedIndex();
+  const res = await aemHeadlessClient.getQueryIndex();
   const headlines = res?.data?.redheadlineList?.items || [];
   const logo = res?.data?.logoList?.items || [];
 

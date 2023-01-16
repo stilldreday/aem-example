@@ -1,16 +1,3 @@
-/*
- * Copyright 2022 Adobe. All rights reserved.
- * This file is licensed to you under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License. You may obtain a copy
- * of the License at http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software distributed under
- * the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
- * OF ANY KIND, either express or implied. See the License for the specific language
- * governing permissions and limitations under the License.
- *
- */
-
 import AEMHeadless from '@adobe/aem-headless-client-js';
 
 
@@ -24,13 +11,14 @@ class AemHeadlessClient {
 
   /**
    * Create an instance of the AEM Headles Client for JS used to communicate with AEM Headless GraphQL endpoints.
-   * 
+   * "/content/cq:graphql/audired/endpoint.json", //
+   * process.env.NEXT_PUBLIC_AEM_GRAPHQL_ENDPOINT
    * @param {*} serviceURL the AEM HOST this Next.js app will connect to.
    */
-  constructor({ serviceURL }) {
+  constructor({ serviceURL, endpoint }) {
     this.aemHeadlessClient = new AEMHeadless({
       serviceURL: serviceURL,
-      endpoint: 'The endpoint is not used as it only applies to client-side GraphQL queries which are not Adobe best practices.',
+      endpoint: endpoint,
       auth: this._getAuth(),
       fetch: fetch
     });
@@ -64,11 +52,12 @@ class AemHeadlessClient {
 
   /**
    * Invokes the 'adventures-all` persisted query using the parameterizable namespace.
-   * 
+   * {endpoint:process.env.NEXT_PUBLIC_AEM_GRAPHQL_ENDPOINT}
    * @returns a GraphQL response of all headlines.
    */
-  async getAllHeadlines() {
-    const queryHeadlinesAll = process.env.NEXT_PUBLIC_AEM_GRAPHQL_ENDPOINT + '/index-all';
+  async getPresistedIndex() {
+    const queryHeadlinesAll = process.env.NEXT_PUBLIC_AEM_GRAPHQL_ENDPOINT + '/index';
+
     
     try {
       return await this.aemHeadlessClient.runPersistedQuery(queryHeadlinesAll);
@@ -77,10 +66,37 @@ class AemHeadlessClient {
     }    
   }
 
+  async getQueryIndex() {
+    //const queryHeadlinesAll = process.env.NEXT_PUBLIC_AEM_GRAPHQL_ENDPOINT + '/index';
+
+    try {
+      return await this.aemHeadlessClient.runQuery(`
+      query{
+        redheadlineList{
+          items{
+            headline
+          }
+        }
+        logoList{
+          items{
+            picture{
+              ... on ImageRef{
+                _authorUrl
+                _publishUrl
+              }
+            }
+          }
+        }
+      }
+      `)
+    } catch(e) {
+      console.error(e)
+    }    
+  }
 
 }
 
 /**
  * Export the initialized AEM Headless client object for use in the Next.js app
  */
-export default new AemHeadlessClient({ serviceURL: process.env.NEXT_PUBLIC_AEM_HOST });
+export default new AemHeadlessClient({serviceURL: process.env.NEXT_PUBLIC_AEM_HOST , endpoint:"/content/cq:graphql/audired/endpoint.json"});

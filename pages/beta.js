@@ -1,12 +1,13 @@
 import Head from 'next/head'
 import Image from 'next/image'
-import aemHeadlessClient from '../cms/aem-headless';
 
-export default function Home({ headlines, logo}) {
+import getBetaQueryIndex from '../cms/aem-lib';
 
-  const sanityIoImageLoader = ( ) => {
-    return logo[0].picture._authorUrl
-  }
+export default function Home({ respose}) {
+
+  // const sanityIoImageLoader = ( ) => {
+  //   return logo[0].picture._authorUrl
+  // }
 
   return (
     <>
@@ -17,7 +18,9 @@ export default function Home({ headlines, logo}) {
         <link rel="icon" href="/audi-icon.ico" />
       </Head>
       <main className='flex h-screen'>
-        <div className='m-auto'>
+        hello
+        {console.log(respose)}
+        {/* <div className='m-auto'>
           <div className='flex justify-center py-8'>
            {console.log(logo)}
            <Image
@@ -36,7 +39,7 @@ export default function Home({ headlines, logo}) {
                       );
             } 
             )}
-         </div>
+         </div> */}
      
       </main>
     </>
@@ -45,20 +48,13 @@ export default function Home({ headlines, logo}) {
 }
 
 export async function getServerSideProps() {
-  const res = await aemHeadlessClient.getPresistedIndex();
-  const headlines = res?.data?.redheadlineList?.items || [];
-  const logo = res?.data?.logoList?.items || [];
-
-  if (!headlines.length) {
-    return {
-      notFound: true,
-    }
-  }
-
+  const respose = await getBetaQueryIndex()
+  const headlines = respose?.data?.redheadlineList?.items || [];
+  const logo = respose?.data?.logoList?.items || [];
+  console.log(respose)
   return {
     props: {
-      headlines,
-      logo
+      respose
    
     }
   };
